@@ -3,6 +3,7 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
+use ProVallo\Core;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +22,7 @@ class PluginInstallCommand extends Command
     public function execute (InputInterface $input, OutputInterface $output)
     {
         $name   = trim($input->getArgument('name'));
-        $result = self::plugins()->install($name);
+        $result = Core::plugins()->install($name);
         
         if (isSuccess($result))
         {

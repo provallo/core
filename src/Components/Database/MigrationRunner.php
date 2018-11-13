@@ -4,8 +4,8 @@ namespace ProVallo\Components\Database;
 
 use DirectoryIterator;
 use Exception;
-use Favez\Mvc\App;
 use IteratorIterator;
+use ProVallo\Core;
 use ProVallo\Models\Schema\Schema;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -106,7 +106,7 @@ class MigrationRunner
                     $sql    = $statement[0];
                     $params = $statement[1];
                     
-                    App::db()->query($sql)->execute($params);
+                    Core::db()->query($sql)->execute($params);
                 }
                 
                 $schema->endDate = date('Y-m-d H:i:s');
@@ -161,8 +161,8 @@ class MigrationRunner
                 throw new Exception('Invalid migration file: ' . $file->getFilename());
             }
             
-            /** @var \CMS\Components\Database\Migration $migration */
-            $migration = new $className(App::instance(), $version);
+            /** @var \ProVallo\Components\Database\Migration $migration */
+            $migration = new $className(Core::instance(), $version);
             $migration->up();
             
             $migrations[$version] = $migration->getSQL();

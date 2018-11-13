@@ -3,7 +3,7 @@
 namespace ProVallo\Components\Plugin;
 
 use Exception;
-use Favez\Mvc\App;
+use ProVallo\Core;
 use ProVallo\Models\Plugin\Dependency;
 use ProVallo\Models\Plugin\Plugin;
 
@@ -67,7 +67,7 @@ class DependencyManager
      */
     public function getDependencies ($name)
     {
-        $dependencies = App::db()->from('plugin p')
+        $dependencies = Core::db()->from('plugin p')
             ->select(null)->select('p.name')
             ->leftJoin('plugin_dependency pd ON pd.pluginID = p.id')
             ->where('p.active = 1')

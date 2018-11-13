@@ -2,8 +2,8 @@
 
 namespace ProVallo\Components\Plugin;
 
-use Favez\Mvc\App;
 use ProVallo\Components\Database\MigrationRunner;
+use ProVallo\Core;
 
 abstract class Bootstrap
 {
@@ -42,7 +42,7 @@ abstract class Bootstrap
     {
         if ($this->relativePath === null)
         {
-            $this->relativePath = substr($this->getPath(), strlen(App::path()));
+            $this->relativePath = substr($this->getPath(), strlen(Core::path()));
         }
         
         return $this->relativePath;
@@ -63,7 +63,7 @@ abstract class Bootstrap
         return true;
     }
     
-    public function update ($oldVersion)
+    public function update ($previousVersion)
     {
         return true;
     }
@@ -72,12 +72,11 @@ abstract class Bootstrap
     
     protected function registerController ($moduleName, $controllerName, $registerRoutes = true)
     {
-        $controllerClass = 'CMS\\Controllers\\' . $moduleName . '\\' . $controllerName . 'Controller';
+        $controllerClass = 'ProVallo\\Controllers\\' . $moduleName . '\\' . $controllerName . 'Controller';
         $eventName       = 'controller.resolve.' . strtolower($moduleName) . '.' . $controllerName;
         $controllerFile  = $this->getPath() . 'Controllers/' . $moduleName . '/' . $controllerName . 'Controller.php';
         
-        $this->subscribeEvent($eventName, function () use ($controllerFile, $controllerClass)
-        {
+        $this->subscribeEvent($eventName, function () use ($controllerFile, $controllerClass) {
             if (!class_exists($controllerClass))
             {
                 require_once $controllerFile;
@@ -89,7 +88,7 @@ abstract class Bootstrap
             $pattern = '/' . strtolower($moduleName) . '/' . strtolower($controllerName) . '[/{action}]';
             $target  = strtolower($moduleName) . ':' . $controllerName . ':{action}';
             
-            App::instance()->any($pattern, $target);
+            Core::instance()->any($pattern, $target);
         }
     }
     
@@ -110,45 +109,13 @@ abstract class Bootstrap
             }
         }
         
-        App::events()->subscribe($eventName, $handler);
-    }
-    
-    /**
-     * Method to create a backend menu entry.
-     *
-     * @requires BackendMenu
-     *
-     * @param    array $data
-     *
-     * @return BackendMenu
-     */
-    protected function createMenu ($data)
-    {
-        $menu = BackendMenu::create();
-        $menu->set($data);
-        
-        $menu->pluginID = $this->instance->getModel()->id;
-        $menu->save();
-        
-        return $menu;
-    }
-    
-    protected function createForm ()
-    {
-        $model = $this->instance->getModel();
-        $name  = 'plugin_' . $model->name;
-        $form  = Form::load($name);
-        
-        $form->form()->label    = $model->label;
-        $form->form()->pluginID = $model->id;
-        
-        return $form;
+        Core::events()->subscribe($eventName, $handler);
     }
     
     /**
      * Run migrations for the current plugin.
      */
-    protected function migrateDb ()
+    protected function installDB ()
     {
         $pluginID  = $this->getInstance()->getModel()->id;
         $directory = path($this->getPath(), 'Migrations');

@@ -11,7 +11,8 @@
         "favez/orm": "1.1.2",
         "slim/http-cache": "^0.4.0",
         
-        "php": "^7.0"
+        "php": "^7.0",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {

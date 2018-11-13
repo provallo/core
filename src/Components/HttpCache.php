@@ -2,7 +2,7 @@
 
 namespace ProVallo\Components;
 
-use Favez\Mvc\App;
+use ProVallo\Core;
 use Slim\Http\Body;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -11,7 +11,7 @@ class HttpCache
 {
     
     /**
-     * @var \Favez\Mvc\App
+     * @var Core
      */
     protected $app;
     
@@ -25,7 +25,7 @@ class HttpCache
      */
     protected $cacheKey;
     
-    public function __construct (\Favez\Mvc\App $app)
+    public function __construct (Core $app)
     {
         $this->app      = $app;
         $this->cacheKey = null;
@@ -51,7 +51,7 @@ class HttpCache
     protected function beforeRequest (Request $request, Response $response)
     {
         $cacheKey = $this->getCacheKey();
-        $item     = App::cache()->getItem($cacheKey);
+        $item     = Core::cache()->getItem($cacheKey);
         
         if ($item->isHit())
         {
@@ -83,7 +83,7 @@ class HttpCache
         if ($this->needsCache($request, $response))
         {
             $cacheKey = $this->getCacheKey();
-            $item     = App::cache()->getItem($cacheKey);
+            $item     = Core::cache()->getItem($cacheKey);
             $content  = [
                 'headers' => $response->getHeaders(),
                 'body'    => (string) $response->getBody()
@@ -94,7 +94,7 @@ class HttpCache
             $item->save();
             
             //
-            $item = App::cache()->getItem('http_cache/keys/' . $this->cacheKey);
+            $item = Core::cache()->getItem('http_cache/keys/' . $this->cacheKey);
             $keys = [];
             
             if (!$item->isMiss())
@@ -114,19 +114,12 @@ class HttpCache
     
     protected function getCacheKey ()
     {
-        return 'http_cache/items/' . md5((string) App::request()->getUri());
+        return 'http_cache/items/' . md5((string) Core::request()->getUri());
     }
     
     protected function needsCache (Request $request, Response $response)
     {
         if (empty($this->cacheKey))
-        {
-            return false;
-        }
-        
-        $path = $request->getUri()->getPath();
-        
-        if (strpos($path, '/api') === 0)
         {
             return false;
         }

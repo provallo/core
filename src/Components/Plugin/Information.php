@@ -40,6 +40,11 @@ class Information
      */
     private $requires;
     
+    /**
+     * @var array
+     */
+    private $data;
+    
     public function __construct ($filename)
     {
         $contents = file_get_contents($filename);
@@ -57,6 +62,7 @@ class Information
         $this->email       = $data['email'];
         $this->version     = $data['version'];
         $this->requires    = $data['requires'] ?? [];
+        $this->data        = $data;
     }
     
     public function getLabel ()
@@ -92,6 +98,11 @@ class Information
     public function getRequires ()
     {
         return $this->requires;
+    }
+    
+    public function toArray ()
+    {
+        return $this->data;
     }
     
 }

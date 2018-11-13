@@ -3,6 +3,7 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
+use ProVallo\Core;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,7 +22,7 @@ class PluginUninstallCommand extends Command
     public function execute (InputInterface $input, OutputInterface $output)
     {
         $name   = trim($input->getArgument('name'));
-        $result = self::plugins()->uninstall($name);
+        $result = Core::plugins()->uninstall($name);
         
         if (isSuccess($result))
         {

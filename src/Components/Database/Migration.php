@@ -2,7 +2,7 @@
 
 namespace ProVallo\Components\Database;
 
-use Favez\Mvc\App;
+use ProVallo\Core;
 
 abstract class Migration
 {
@@ -22,7 +22,7 @@ abstract class Migration
      */
     protected $version;
     
-    public function __construct (App $app, $version)
+    public function __construct (Core $app, $version)
     {
         $this->app     = $app;
         $this->version = $version;
