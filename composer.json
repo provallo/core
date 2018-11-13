@@ -7,7 +7,7 @@
         "tyurderi/validator": "^1.0",
         "doctrine/dbal": "^2.5",
         "league/flysystem": "^1.0",
-        "favez/favez": "2.0.3",
+        "favez/favez": "2.0.4",
         "favez/orm": "1.1.2",
         "slim/http-cache": "^0.4.0",
         
