@@ -72,7 +72,7 @@ class MigrationRunner
         }
         
         $executedCount = 0;
-        
+
         foreach ($migrations as $version => $statements)
         {
             if ($this->pluginID === -1 && $version === 100 && !$this->tableExists('schema_version'))
@@ -81,7 +81,7 @@ class MigrationRunner
                 $this->executeSQL($statements);
                 
                 $executedCount++;
-    
+
                 $schema            = Schema::create();
                 $schema->version   = $version;
                 $schema->startDate = date('Y-m-d H:i:s');
@@ -204,7 +204,9 @@ class MigrationRunner
             
             $migrations[$version] = $migration->getSQL();
         }
-        
+
+        ksort($migrations);
+
         return $migrations;
     }
     
