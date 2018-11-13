@@ -28,7 +28,8 @@ class Core extends \Favez\Mvc\App
         if ($config === null)
         {
             $config = new Config();
-            $config->loadFrom(__DIR__ . '/../config.inc.php');
+            $config->loadFrom(__DIR__ . '/Config/Default.php');
+            $config->extendFrom(self::path() . 'config.php');
         }
         
         parent::__construct($config->toArray());

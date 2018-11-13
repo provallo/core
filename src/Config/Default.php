@@ -1,11 +1,11 @@
 <?php
 
-return array_replace_recursive([
+return [
     'config'   => [
         'modules'   => [],
         'view'      => [
-            'theme_path' => '%app.relative_theme_path%',
-            'cache_path' => '%app.relative_theme_cache_path%'
+            'theme_path' => 'themes/',
+            'cache_path' => 'cache/twig/'
         ],
         'database'  => [
             'host' => '%database.host%',
@@ -14,12 +14,11 @@ return array_replace_recursive([
             'pass' => '%database.pass%'
         ],
         'app'       => [
-            'path'       => '%app.path%',
-            'cache_path' => '%app.relative_cache_path%'
+            'path'       => realpath(__DIR__ . '/../..'),
+            'cache_path' => 'cache/'
         ],
-        'debug'     => true,
         'plugin'    => [
-            'path' => '%app.relative_plugin_path%'
+            'path' => 'ext/'
         ],
         'httpCache' => [
             'enabled' => true
@@ -31,9 +30,10 @@ return array_replace_recursive([
                 'lifetime'    => '1 year',
                 'autorefresh' => true
             ]
-        ]
+        ],
+        'debug' => true
     ],
     'settings' => [
         'displayErrorDetails' => true
     ]
-], ($f = __DIR__ . '/config.user.php') && is_file($f) ? require_once $f : []);
+];
