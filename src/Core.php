@@ -40,9 +40,14 @@ class Core extends \Favez\Mvc\App
         {
             $this->httpCache()->register();
         }
-        
+    }
+    
+    public function run ($silent = false)
+    {
         $this->executePlugins($this->plugins());
         $this->registerRoutes();
+        
+        return parent::run($silent);
     }
     
     /**
@@ -67,63 +72,6 @@ class Core extends \Favez\Mvc\App
         $modules[$name] = $config;
         
         self::config()->set('modules', $modules);
-        
-        return $this;
-    }
-    
-    /**
-     * Set default paths which are generally required
-     *
-     * Core::instance()->setPaths([
-     *     'app_path'         => 'absolute path',
-     *     'app_cache_path'   => 'relative path to app_path',
-     *     'theme_path'       => 'relative path to app_path',
-     *     'theme_cache_path' => 'relative path to app_path',
-     *     'plugin_path'      => 'relative path to app_path'
-     * ])
-     *
-     * @param array $paths
-     *
-     * @return self
-     */
-    public function setPaths ($paths)
-    {
-        foreach ($paths as $key => $path)
-        {
-            switch ($key)
-            {
-                case 'app_path':
-                    $app = self::config()->get('app');
-                    $app['path'] = $path;
-                    
-                    self::config()->set('app');
-                break;
-                case 'app_cache_path':
-                    $app = self::config()->get('app');
-                    $app['cache_path'] = $path;
-    
-                    self::config()->set('app');
-                break;
-                case 'theme_path':
-                    $view = self::config()->get('view');
-                    $view['theme_path'] = $path;
-                    
-                    self::config()->set('view', $view);
-                break;
-                case 'theme_cache_path':
-                    $view = self::config()->get('view');
-                    $view['theme_path'] = $path;
-        
-                    self::config()->set('cache_path', $view);
-                break;
-                case 'plugin_path':
-                    $plugin = self::config()->get('plugin');
-                    $plugin['path'] = $path;
-                    
-                    self::config()->set('plugin', $plugin);
-                break;
-            }
-        }
         
         return $this;
     }

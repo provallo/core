@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3bc53a980a9ae93535fcefadf84f3390",
+    "content-hash": "76ab42cf78be6bca9b4d241cee107be6",
     "packages": [
         {
             "name": "bryanjhv/slim-session",
@@ -612,16 +612,16 @@
         },
         {
             "name": "favez/favez",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.com/favez/core.git",
-                "reference": "2bfd2dc1bf69a3105dc1b1101417ad244d73614f"
+                "reference": "ddfb30110d8e34fac141a0c00e6eb02eae280f5d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://gitlab.com/api/v4/projects/favez%2Fcore/repository/archive.zip?sha=2bfd2dc1bf69a3105dc1b1101417ad244d73614f",
-                "reference": "2bfd2dc1bf69a3105dc1b1101417ad244d73614f",
+                "url": "https://gitlab.com/api/v4/projects/favez%2Fcore/repository/archive.zip?sha=ddfb30110d8e34fac141a0c00e6eb02eae280f5d",
+                "reference": "ddfb30110d8e34fac141a0c00e6eb02eae280f5d",
                 "shasum": ""
             },
             "require": {
@@ -655,7 +655,7 @@
                 }
             ],
             "description": "Favez PHP Framework",
-            "time": "2018-11-13T08:52:06+00:00"
+            "time": "2018-11-13T15:06:34+00:00"
         },
         {
             "name": "favez/orm",

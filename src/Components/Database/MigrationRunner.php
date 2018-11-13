@@ -75,6 +75,24 @@ class MigrationRunner
         
         foreach ($migrations as $version => $statements)
         {
+            if ($this->pluginID === -1 && $version === 100 && !$this->tableExists('schema_version'))
+            {
+                $this->output->writeln('Running ' . $version);
+                $this->executeSQL($statements);
+                
+                $executedCount++;
+    
+                $schema            = Schema::create();
+                $schema->version   = $version;
+                $schema->startDate = date('Y-m-d H:i:s');
+                $schema->endDate   = date('Y-m-d H:i:s');
+                $schema->error     = null;
+                $schema->pluginID  = $this->pluginID;
+                $schema->save();
+                
+                continue;
+            }
+            
             $schema = Schema::repository()->findOneBy([
                 'version'  => $version,
                 'pluginID' => $this->pluginID
@@ -101,13 +119,7 @@ class MigrationRunner
             
             try
             {
-                foreach ($statements as $statement)
-                {
-                    $sql    = $statement[0];
-                    $params = $statement[1];
-                    
-                    Core::db()->query($sql)->execute($params);
-                }
+                $this->executeSQL($statements);
                 
                 $schema->endDate = date('Y-m-d H:i:s');
                 $schema->save();
@@ -135,6 +147,31 @@ class MigrationRunner
             'success' => true,
             'total'   => $executedCount
         ];
+    }
+    
+    protected function tableExists ($table)
+    {
+        try
+        {
+            Core::db()->query('SHOW CREATE TABLE ' . $table)->execute();
+        }
+        catch (Exception $ex)
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    protected function executeSQL ($statements)
+    {
+        foreach ($statements as $statement)
+        {
+            $sql    = $statement[0];
+            $params = $statement[1];
+        
+            Core::db()->query($sql)->execute($params);
+        }
     }
     
     protected function findMigrations ()
