@@ -1,0 +1,163 @@
+<?php
+
+namespace ProVallo\Components\Plugin;
+
+use Favez\Mvc\App;
+use ProVallo\Components\Database\MigrationRunner;
+
+abstract class Bootstrap
+{
+    
+    /**
+     * @var Instance
+     */
+    protected $instance;
+    
+    /**
+     * @var string
+     */
+    protected $relativePath;
+    
+    final public function __construct ()
+    {
+    
+    }
+    
+    public function setInstance ($instance)
+    {
+        $this->instance = $instance;
+    }
+    
+    public function getInstance ()
+    {
+        return $this->instance;
+    }
+    
+    public function getPath ()
+    {
+        return $this->instance->getPath();
+    }
+    
+    public function getRelativePath ()
+    {
+        if ($this->relativePath === null)
+        {
+            $this->relativePath = substr($this->getPath(), strlen(App::path()));
+        }
+        
+        return $this->relativePath;
+    }
+    
+    public function getInfo ()
+    {
+        return $this->instance->getInfo();
+    }
+    
+    public function install ()
+    {
+        return true;
+    }
+    
+    public function uninstall ()
+    {
+        return true;
+    }
+    
+    public function update ($oldVersion)
+    {
+        return true;
+    }
+    
+    abstract public function execute ();
+    
+    protected function registerController ($moduleName, $controllerName, $registerRoutes = true)
+    {
+        $controllerClass = 'CMS\\Controllers\\' . $moduleName . '\\' . $controllerName . 'Controller';
+        $eventName       = 'controller.resolve.' . strtolower($moduleName) . '.' . $controllerName;
+        $controllerFile  = $this->getPath() . 'Controllers/' . $moduleName . '/' . $controllerName . 'Controller.php';
+        
+        $this->subscribeEvent($eventName, function () use ($controllerFile, $controllerClass)
+        {
+            if (!class_exists($controllerClass))
+            {
+                require_once $controllerFile;
+            }
+        });
+        
+        if ($registerRoutes)
+        {
+            $pattern = '/' . strtolower($moduleName) . '/' . strtolower($controllerName) . '[/{action}]';
+            $target  = strtolower($moduleName) . ':' . $controllerName . ':{action}';
+            
+            App::instance()->any($pattern, $target);
+        }
+    }
+    
+    protected function subscribeEvent ($eventName, $handler)
+    {
+        if (!is_callable($handler))
+        {
+            if (is_string($handler) && method_exists($this, $handler))
+            {
+                $handler = [
+                    $this,
+                    $handler,
+                ];
+            }
+            else
+            {
+                throw new \Exception('Invalid event handler.');
+            }
+        }
+        
+        App::events()->subscribe($eventName, $handler);
+    }
+    
+    /**
+     * Method to create a backend menu entry.
+     *
+     * @requires BackendMenu
+     *
+     * @param    array $data
+     *
+     * @return BackendMenu
+     */
+    protected function createMenu ($data)
+    {
+        $menu = BackendMenu::create();
+        $menu->set($data);
+        
+        $menu->pluginID = $this->instance->getModel()->id;
+        $menu->save();
+        
+        return $menu;
+    }
+    
+    protected function createForm ()
+    {
+        $model = $this->instance->getModel();
+        $name  = 'plugin_' . $model->name;
+        $form  = Form::load($name);
+        
+        $form->form()->label    = $model->label;
+        $form->form()->pluginID = $model->id;
+        
+        return $form;
+    }
+    
+    /**
+     * Run migrations for the current plugin.
+     */
+    protected function migrateDb ()
+    {
+        $pluginID  = $this->getInstance()->getModel()->id;
+        $directory = path($this->getPath(), 'Migrations');
+        $namespace = $this->getInstance()->getModel()->name . '\\Migrations\\';
+        
+        $runner = new MigrationRunner($pluginID, $directory);
+        $runner->setNamespace($namespace);
+        
+        $runner->run();
+    }
+    
+}

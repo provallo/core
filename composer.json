@@ -1,0 +1,24 @@
+{
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/console": "^3.2",
+        "illuminate/database": "^5.4",
+        "illuminate/events": "^5.4",
+        "tyurderi/validator": "^1.0",
+        "doctrine/dbal": "^2.5",
+        "league/flysystem": "^1.0",
+        "favez/favez": "2.0.3",
+        "favez/orm": "1.1.2",
+        "slim/http-cache": "^0.4.0",
+        
+        "php": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ProVallo\\": "src/"
+        },
+        "files": [
+            "src/Helpers.php"
+        ]
+    }
+}
