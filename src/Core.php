@@ -5,6 +5,7 @@ namespace ProVallo;
 use Favez\Mvc\App;
 use Favez\Mvc\Middleware\JsonResponseMiddleware;
 use ProVallo\Components\Plugin\Manager;
+use Slim\Router;
 
 /**
  * Class Core
@@ -47,6 +48,18 @@ class Core extends \Favez\Mvc\App
     {
         $this->executePlugins($this->plugins());
         $this->registerRoutes();
+
+        /** @var Router $router */
+        if (($router = self::getContainer()->get('router'))
+            && count($router->getRoutes()) === 0)
+        {
+            self::any('/', function ($request, $response, $params) {
+                $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
+                $html = str_replace('../public', '/src/Resources/public', $html);
+
+                return $html;
+            });
+        }
         
         return parent::run($silent);
     }

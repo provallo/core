@@ -1,0 +1,48 @@
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Lato Light'), local('Lato-Light'), url(https://fonts.gstatic.com/s/lato/v14/S6u9w4BMUTPHh7USSwiPHA.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v14/S6uyw4BMUTPHjx4wWw.ttf) format('truetype');
+}
+* {
+  box-sizing: border-box;
+  font-family: 'Lato', sans-serif;
+}
+.app {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 200px auto 0;
+}
+.app .logo {
+  margin: 0 0 50px 0;
+}
+.app .links ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+}
+.app .links ul li.disabled a {
+  cursor: not-allowed;
+}
+.app .links ul li a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 300;
+  display: block;
+  padding: 10px 30px;
+}
+.app .links ul li a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+/*# sourceMappingURL=all.css.map */
