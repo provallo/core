@@ -14,7 +14,7 @@ return [
             'pass' => '%database.pass%'
         ],
         'app'       => [
-            'path'       => realpath(__DIR__ . '/../..'),
+            'path'       => realpath(__DIR__ . '/../..') . '/',
             'cache_path' => 'cache/'
         ],
         'plugin'    => [

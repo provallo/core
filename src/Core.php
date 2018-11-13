@@ -51,7 +51,8 @@ class Core extends \Favez\Mvc\App
 
         /** @var Router $router */
         if (($router = self::getContainer()->get('router'))
-            && count($router->getRoutes()) === 0)
+            && count($router->getRoutes()) === 0
+            || is_dir(self::path() . 'update-assets'))
         {
             self::any('/', function ($request, $response, $params) {
                 $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
