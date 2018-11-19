@@ -104,7 +104,7 @@ class Core extends \Favez\Mvc\App
         });
     }
     
-    protected function executePlugins (Manager $pluginManager)
+    public function executePlugins (Manager $pluginManager)
     {
         $pluginManager->execute();
         

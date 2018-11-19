@@ -1,7 +1,5 @@
 <?php
 
-use Favez\Mvc\App;
-
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -19,7 +17,9 @@ $console->addCommands([
     new \ProVallo\Commands\DbMigrateCommand()
 ]);
 
-if ($commands = App::events()->collect('core.console_commands.collect'))
+$app->executePlugins($app->plugins());
+
+if ($commands = $app->events()->collect('core.console_commands.collect'))
 {
     $console->addCommands($commands);
 }
