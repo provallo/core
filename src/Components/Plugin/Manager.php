@@ -23,14 +23,7 @@ class Manager
      * @var Instance[]
      */
     private $instances;
-    
-    /**
-     * The available plugin namespaces.
-     *
-     * @var string[]
-     */
-    private $namespaces;
-    
+
     /**
      * The plugin dependency manager.
      *
@@ -42,15 +35,12 @@ class Manager
     {
         $this->db                = $db;
         $this->instances         = [];
-        $this->namespaces        = [
-            'custom',
-            'system'
-        ];
         $this->dependencyManager = new DependencyManager();
     }
     
     /**
      * @return Instance[]
+     * @throws \Exception
      */
     public function list ()
     {
@@ -60,7 +50,7 @@ class Manager
         /** @var Plugin $plugin */
         foreach ($plugins as $plugin)
         {
-            $instances[] = $this->loadInstance($plugin->namespace, $plugin->name, $plugin);
+            $instances[] = $this->loadInstance($plugin->name, $plugin);
         }
         
         return $instances;
@@ -69,6 +59,8 @@ class Manager
     /**
      * Synchronize plugins from database with filesystem and the other way
      * around.
+     *
+     * @throws \Exception
      */
     public function synchronize ()
     {
@@ -78,7 +70,7 @@ class Manager
         /** @var Plugin $plugin */
         foreach ($plugins as $plugin)
         {
-            if (!$this->exists($plugin->namespace, $plugin->name))
+            if (!$this->exists($plugin->name))
             {
                 $plugin->remove();
             }
@@ -87,76 +79,73 @@ class Manager
         // Loop through all plugins in filesystem and write/update it in database.
         $plugins = [];
         
-        foreach ($this->namespaces as $namespace)
+        $iterator = new \IteratorIterator(new \DirectoryIterator($this->getPluginDirectory()));
+
+        /**
+         * @var integer            $key
+         * @var \DirectoryIterator $file
+         */
+        foreach ($iterator as $key => $file)
         {
-            $iterator = new \IteratorIterator(new \DirectoryIterator($this->getPluginDirectory($namespace)));
-            
-            /**
-             * @var integer            $key
-             * @var \DirectoryIterator $file
-             */
-            foreach ($iterator as $key => $file)
+            if ($file->isDot() || $file->isFile())
             {
-                if ($file->isDot() || $file->isFile())
-                {
-                    continue; // Skip "." and ".." and normal files.
-                }
-                
-                $name  = $file->getBasename();
-                $model = $this->getModel($name);
-                
-                if (!($model instanceof Plugin))
-                {
-                    $model            = Plugin::create();
-                    $model->active    = 0;
-                    $model->namespace = $namespace;
-                    $model->name      = $name;
-                    $model->created   = date('Y-m-d H:i:s');
-                    $model->changed   = date('Y-m-d H:i:s');
-                }
-                
-                $instance = $this->loadInstance($model->namespace, $model->name, $model);
-                $info     = $instance->getInfo();
-                
-                $model->label       = $info->getLabel();
-                $model->description = $info->getDescription();
-                $model->author      = $info->getAuthor();
-                $model->website     = $info->getWebsite();
-                $model->email       = $info->getEmail();
-                
-                // Do not update the model version every time for future updates.
-                // Update plugin version when plugin is not installed.
-                if (empty($model->version) || $model->active == 0)
-                {
-                    $model->version = $info->getVersion();
-                }
-                
-                $model->save();
-                
-                $this->dependencyManager->update($instance);
+                continue; // Skip "." and ".." and normal files.
             }
+
+            $name  = $file->getBasename();
+            $model = $this->getModel($name);
+
+            if (!($model instanceof Plugin))
+            {
+                $model            = Plugin::create();
+                $model->active    = 0;
+                $model->name      = $name;
+                $model->created   = date('Y-m-d H:i:s');
+                $model->changed   = date('Y-m-d H:i:s');
+            }
+
+            $instance = $this->loadInstance($model->name, $model);
+            $info     = $instance->getInfo();
+
+            $model->label       = $info->getLabel();
+            $model->description = $info->getDescription();
+            $model->author      = $info->getAuthor();
+            $model->website     = $info->getWebsite();
+            $model->email       = $info->getEmail();
+
+            // Do not update the model version every time for future updates.
+            // Update plugin version when plugin is not installed.
+            if (empty($model->version) || $model->active == 0)
+            {
+                $model->version = $info->getVersion();
+            }
+
+            $model->save();
+
+            $this->dependencyManager->update($instance);
         }
-        
+
         return $plugins;
     }
     
     /**
      * Checks whether the plugin exists on filesystem or not.
      *
-     * @param string $namespace
      * @param string $name
      * @param string $className
      * @param string $path
      *
      * @return bool
+     * @throws \Exception
      */
-    public function exists ($namespace, $name, &$className = null, &$path = null)
+    public function exists ($name, &$className = null, &$path = null)
     {
-        $className = $this->getClassName($name);
-        $path      = $this->getPluginDirectory($namespace) . $name . '/';
+        $namespace = 'ProVallo\\Plugins\\' . $name . '\\';
+        $className = $namespace . 'Bootstrap';
+        $path      = $this->getPluginDirectory() . $name . '/';
         
-        self::app()->loader()->setPsr4($name . '\\', $path);
-        
+        self::app()->loader()->setPsr4($namespace, $path);
+
         return class_exists($className);
     }
     
@@ -170,11 +159,11 @@ class Manager
      * @throws \Exception
      * @return Instance
      */
-    public function loadInstance ($namespace, $name, $model = null)
+    public function loadInstance ($name, $model = null)
     {
         if (!isset($this->instances[$name]))
         {
-            if (!$this->exists($namespace, $name, $className, $path))
+            if (!$this->exists($name, $className, $path))
             {
                 throw new Exception('Trying to access unknown plugin: ' . $name);
             }
@@ -202,20 +191,18 @@ class Manager
      */
     public function getClassName ($name)
     {
-        return $name . '\\Bootstrap';
+        return 'ProVallo\\Plugins\\' . $name;
     }
     
     /**
      * Returns the actually plugin directory for the given namespace.
      *
-     * @param string $namespace
-     *
      * @return string
      * @throws \Exception Usually when the namespace does not exists.
      */
-    public function getPluginDirectory ($namespace)
+    public function getPluginDirectory ()
     {
-        $directory = self::config('app.path') . self::config('plugin.path') . $namespace . '/';
+        $directory = self::config('app.path') . self::config('plugin.path');
         
         if (!is_dir($directory))
         {
@@ -237,14 +224,14 @@ class Manager
         foreach ($plugins as $plugin)
         {
             // If the plugin does not exists in filesystem disable it and do not try to execute it to prevent errors.
-            if (!$this->exists($plugin->namespace, $plugin->name))
+            if (!$this->exists($plugin->name))
             {
                 $plugin->active = 0;
                 $plugin->save();
                 continue;
             }
             
-            $instance = $this->loadInstance($plugin->namespace, $plugin->name, $plugin);
+            $instance = $this->loadInstance($plugin->name, $plugin);
             $instance->getBootstrap()->execute();
         }
     }
@@ -261,7 +248,7 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
-            $instance = $this->loadInstance($model->namespace, $model->name, $model);
+            $instance = $this->loadInstance($model->name, $model);
             
             if ((int) $model->active === 1)
             {
@@ -306,7 +293,7 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
-            $instance = $this->loadInstance($model->namespace, $model->name, $model);
+            $instance = $this->loadInstance($model->name, $model);
             
             if ((int) $model->active === 0)
             {
@@ -346,7 +333,7 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
-            $instance = $this->loadInstance($model->namespace, $model->name, $model);
+            $instance = $this->loadInstance($model->name, $model);
             
             if ((int) $model->active === 0)
             {
@@ -410,7 +397,7 @@ class Manager
         {
             $model = $this->getModel($name);
             
-            $this->loadInstance($model->namespace, $model->name, $model);
+            $this->loadInstance($model->name, $model);
         }
         
         return $this->instances[$name]->getBootstrap();
@@ -428,7 +415,7 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
-            $instance = $this->loadInstance($model->namespace, $model->name, $model);
+            $instance = $this->loadInstance($model->name, $model);
             $files    = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($instance->getPath(), RecursiveDirectoryIterator::SKIP_DOTS),
                 RecursiveIteratorIterator::CHILD_FIRST

@@ -31,7 +31,11 @@ return [
                 'autorefresh' => true
             ]
         ],
-        'debug' => true
+        'debug' => true,
+
+        'update_api' => [
+            'endpoint' => 'https://store.yurderi.de/'
+        ]
     ],
     'settings' => [
         'displayErrorDetails' => true

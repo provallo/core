@@ -18,14 +18,12 @@ use Slim\Router;
 class Core extends \Favez\Mvc\App
 {
     
-    public function __construct (Config $config = null)
+    public function __construct (Config $config = null, $loader = null)
     {
         App::$instance = $this;
         
-        /** @var \Composer\Autoload\ClassLoader $loader */
-        $loader = require_once __DIR__ . '/../vendor/autoload.php';
         $this->setLoader($loader);
-        
+
         if ($config === null)
         {
             $config = new Config();
@@ -34,8 +32,7 @@ class Core extends \Favez\Mvc\App
         }
         
         parent::__construct($config->toArray());
-        $this->setLoader($loader);
-        
+
         $this->registerServices();
         
         if ($this->config('httpCache.enabled') === true)
