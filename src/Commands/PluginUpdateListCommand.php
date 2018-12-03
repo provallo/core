@@ -27,15 +27,16 @@ class PluginUpdateListCommand extends Command
 
         $output->write('Please wait...');
 
+        /** @var \ProVallo\Components\Plugin\Updater\Update $availableUpdates */
         $availableUpdates = [];
 
         foreach ($plugins as $plugin)
         {
             $update = $updater->checkForUpdate($plugin);
             
-            if ($update !== null)
+            if ($update instanceof Updater\Update)
             {
-                $availableUpdates[] = compact('plugin', 'update');
+                $availableUpdates[] = $update;
             }
             
             $output->write('.');
@@ -49,7 +50,24 @@ class PluginUpdateListCommand extends Command
             return;
         }
         
-        
+        /**
+         * @var integer $i
+         * @var \ProVallo\Components\Plugin\Updater\Update $update
+         */
+        foreach ($availableUpdates as $i => $update)
+        {
+            $name = $update->getPlugin()->getName();
+            $currentVersion = $update->getPlugin()->getInfo()->getVersion();
+            $newVersion = $update->getVersion();
+            
+            $output->writeln(sprintf(
+                '  %d. %s (%s => %s)',
+                $i + 1,
+                $name,
+                $currentVersion,
+                $newVersion
+            ));
+        }
     }
 
 }

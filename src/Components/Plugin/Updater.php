@@ -3,6 +3,7 @@
 namespace ProVallo\Components\Plugin;
 
 use Favez\Mvc\DI\Injectable;
+use ProVallo\Components\Plugin\Updater\Update;
 
 class Updater
 {
@@ -16,7 +17,7 @@ class Updater
         
         if ($data['isNewer'] === true)
         {
-        
+            return new Update($data, $plugin);
         }
         
         return null;
