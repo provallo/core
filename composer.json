@@ -12,7 +12,8 @@
         "slim/http-cache": "^0.4.0",
         
         "php": "^7.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-zip": "*"
     },
     "autoload": {
         "psr-4": {

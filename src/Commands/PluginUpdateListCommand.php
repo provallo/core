@@ -3,10 +3,8 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
-use ProVallo\Components\Plugin\Instance;
 use ProVallo\Components\Plugin\Manager;
 use ProVallo\Components\Plugin\Updater;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 

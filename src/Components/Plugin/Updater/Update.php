@@ -2,8 +2,11 @@
 
 namespace ProVallo\Components\Plugin\Updater;
 
+use Favez\Mvc\DI\Injectable;
+
 class Update
 {
+    use Injectable;
     
     /**
      * @var string
@@ -43,6 +46,31 @@ class Update
         $this->releaseNotes = $data['releaseNotes'];
         $this->filename     = $data['filename'];
         $this->plugin       = $plugin;
+    }
+    
+    public function download ()
+    {
+        $filename = sys_get_temp_dir() . DIRECTORY_SEPARATOR . md5(time() . $this->version . $this->filename);
+        $contents = file_get_contents($this->filename);
+        
+        file_put_contents($filename, $contents);
+        
+        return $filename;
+    }
+    
+    public function extract ($filename)
+    {
+        $zip = new \ZipArchive();
+        $zip->open($filename);
+        
+        if ($zip->extractTo($this->plugin->getPath()))
+        {
+            $zip->close();
+            
+            return true;
+        }
+        
+        return false;
     }
     
     /**
