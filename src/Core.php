@@ -14,6 +14,8 @@ use Slim\Router;
  *
  * @method \ProVallo\Components\HttpCache      httpCache()
  * @method \ProVallo\Components\Plugin\Manager plugins()
+ *
+ * @method static \ProVallo\Core instance()
  */
 class Core extends \Favez\Mvc\App
 {

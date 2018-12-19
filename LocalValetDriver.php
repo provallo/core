@@ -1,6 +1,6 @@
 <?php
 
-class LocalValetDriver extends LaravelValetDriver
+class LocalValetDriver extends ValetDriver
 {
 
     public function serves($sitePath, $siteName, $uri)

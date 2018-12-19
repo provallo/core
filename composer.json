@@ -7,8 +7,8 @@
         "tyurderi/validator": "^1.0",
         "doctrine/dbal": "^2.5",
         "league/flysystem": "^1.0",
-        "favez/favez": "2.0.5",
-        "favez/orm": "1.1.2",
+        "favez/favez": "dev-master",
+        "favez/orm": "dev-master",
         "slim/http-cache": "^0.4.0",
         
         "php": "^7.0",
@@ -22,5 +22,15 @@
         "files": [
             "src/Helpers.php"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../favez/core"
+        },
+        {
+            "type": "path",
+            "url": "../../favez/orm"
+        }
+    ]
 }
