@@ -47,19 +47,6 @@ class Core extends \Favez\Mvc\App
     {
         $this->executePlugins($this->plugins());
         $this->registerRoutes();
-
-        /** @var Router $router */
-        if (($router = self::getContainer()->get('router'))
-            && count($router->getRoutes()) === 0
-            || is_dir(self::path() . 'update-assets'))
-        {
-            self::any('/', function ($request, $response, $params) {
-                $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
-                $html = str_replace('../public', '/src/Resources/public', $html);
-
-                return $html;
-            });
-        }
         
         return parent::run($silent);
     }
@@ -115,6 +102,25 @@ class Core extends \Favez\Mvc\App
         $this->add(new JsonResponseMiddleware());
         
         $this->events()->publish('core.route.register');
+    
+        /** @var Router $router */
+        $router = self::getContainer()->get('router');
+        
+        /** @var \Slim\Route $route */
+        foreach ($router->getRoutes() as $route)
+        {
+            if ($route->getPattern() === '/')
+            {
+                return;
+            }
+        }
+    
+        self::any('/', function ($request, $response, $params) {
+            $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
+            $html = str_replace('../public', '/src/Resources/public', $html);
+        
+            return $html;
+        });
     }
     
 }

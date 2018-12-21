@@ -342,7 +342,7 @@ class Manager
             
             if (version_compare($model->version, $instance->getInfo()->getVersion(), '>='))
             {
-                throw new Exception('The installed plugin version is higher than the version on filesystem.');
+                throw new Exception('The plugin is already up-to-date.');
             }
             
             self::events()->publish('core.plugin.pre_update', ['instance' => $instance]);

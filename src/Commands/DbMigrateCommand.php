@@ -32,6 +32,7 @@ class DbMigrateCommand extends Command
             $directory = realpath(__DIR__ . '/../../update-assets/migrations/');
             $runner    = new MigrationRunner(-1, $directory);
             $runner->setOutput($output);
+            $runner->setNamespace('ProVallo\\Migrations\\');
         }
         else
         {

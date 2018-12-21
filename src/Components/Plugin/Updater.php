@@ -8,16 +8,19 @@ use ProVallo\Components\Plugin\Updater\Update;
 class Updater
 {
     use Injectable;
-
-    public function checkForUpdate(Instance $plugin)
+    
+    public function checkForUpdate (Instance $plugin)
     {
-        $url = $this->buildRequestUri($plugin);
+        $url  = $this->buildRequestUri($plugin);
         $data = file_get_contents($url);
         $data = json_decode($data, true);
         
-        if ($data['isNewer'] === true)
+        if ($data['success'] === true)
         {
-            return new Update($data, $plugin);
+            if ($data['isNewer'] === true)
+            {
+                return new Update($data, $plugin);
+            }
         }
         
         return null;
@@ -36,5 +39,5 @@ class Updater
         
         return $baseUrl;
     }
-
+    
 }
