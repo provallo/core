@@ -14,5 +14,9 @@
     "0.0.5": [
       "Fix composer dependencies"
     ]
+  },
+  "package": {
+    "channel": "stable",
+    "platform": "provallo-core"
   }
 }
