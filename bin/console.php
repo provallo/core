@@ -20,7 +20,7 @@ $console->addCommands([
 
 $app->executePlugins($app->plugins());
 
-if ($commands = $app->events()->collect('core.console_commands.collect'))
+if ($commands = $app->events()->collect('console.register'))
 {
     $console->addCommands($commands);
 }
