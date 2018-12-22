@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -8,7 +8,7 @@
     "0.0.2": [
       "Several changes and improvements"
     ],
-    "0.0.3": [
+    "0.0.4": [
       "Rename event from core.console_commands.collect to console.register"
     ]
   }
