@@ -20,9 +20,19 @@ use Slim\Router;
 class Core extends \Favez\Mvc\App
 {
     
-    public function __construct (Config $config = null, $loader = null)
+    const API_CONSOLE = 'console';
+    
+    const API_WEB = 'web';
+    
+    /**
+     * @var string
+     */
+    protected $api;
+    
+    public function __construct (Config $config = null, $loader = null, $api = self::API_CONSOLE)
     {
         App::$instance = $this;
+        $this->api     = $api;
         
         $this->setLoader($loader);
 
@@ -45,10 +55,15 @@ class Core extends \Favez\Mvc\App
     
     public function run ($silent = false)
     {
-        $this->executePlugins($this->plugins());
+        $this->executePlugins();
         $this->registerRoutes();
         
         return parent::run($silent);
+    }
+    
+    public function getApi ()
+    {
+        return $this->api;
     }
     
     /**
@@ -77,6 +92,19 @@ class Core extends \Favez\Mvc\App
         return $this;
     }
     
+    /**
+     * Executes plugin logic (only installed plugins)
+     */
+    public function executePlugins ()
+    {
+        self::plugins()->execute();
+        
+        $this->events()->publish('core.plugin.execute');
+    }
+    
+    /**
+     * Registers basic services.
+     */
     protected function registerServices ()
     {
         $container = $this->di();
@@ -90,13 +118,10 @@ class Core extends \Favez\Mvc\App
         });
     }
     
-    public function executePlugins (Manager $pluginManager)
-    {
-        $pluginManager->execute();
-        
-        $this->events()->publish('core.plugin.execute');
-    }
-    
+    /**
+     * Registers middleware and custom routes.
+     * If no route for "/" is defined a default one will be registered.
+     */
     protected function registerRoutes ()
     {
         $this->add(new JsonResponseMiddleware());

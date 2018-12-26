@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -13,6 +13,12 @@
     ],
     "0.0.5": [
       "Fix composer dependencies"
+    ],
+    "0.0.6": [
+      "Rename bin/console.php to bin/console for easier access",
+      "Add update-assets/cleanup.txt to remove deprecated files",
+      "Read version dynamically in bin/console",
+      "Implement variable to determine current API (if console or web)"
     ]
   },
   "package": {
