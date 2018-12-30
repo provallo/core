@@ -5,6 +5,8 @@ namespace ProVallo;
 use Favez\Mvc\App;
 use Favez\Mvc\Middleware\JsonResponseMiddleware;
 use ProVallo\Components\Plugin\Manager;
+use Slim\Http\Request;
+use Slim\Http\Response;
 use Slim\Router;
 
 /**
@@ -125,27 +127,19 @@ class Core extends \Favez\Mvc\App
     protected function registerRoutes ()
     {
         $this->add(new JsonResponseMiddleware());
+    
+        Core::instance()->getContainer()['notFoundHandler'] = function() {
+            return function (Request $request, Response $response) {
+                $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
+                $html = str_replace('../public', '/src/Resources/public', $html);
+                
+                $response->getBody()->write($html);
+                
+                return $response;
+            };
+        };
         
         $this->events()->publish('core.route.register');
-    
-        /** @var Router $router */
-        $router = self::getContainer()->get('router');
-        
-        /** @var \Slim\Route $route */
-        foreach ($router->getRoutes() as $route)
-        {
-            if ($route->getPattern() === '/')
-            {
-                return;
-            }
-        }
-    
-        self::any('/', function ($request, $response, $params) {
-            $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
-            $html = str_replace('../public', '/src/Resources/public', $html);
-        
-            return $html;
-        });
     }
     
 }

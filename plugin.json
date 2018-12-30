@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -19,6 +19,10 @@
       "Add update-assets/cleanup.txt to remove deprecated files",
       "Read version dynamically in bin/console",
       "Implement variable to determine current API (if console or web)"
+    ],
+    "0.0.7": [
+      "Add /media directory to .gitignore",
+      "Better implementation for the default site when no routes are registered"
     ]
   },
   "package": {
