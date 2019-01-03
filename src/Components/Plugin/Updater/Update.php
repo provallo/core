@@ -61,7 +61,11 @@ class Update
     public function extract ($filename)
     {
         $zip = new \ZipArchive();
-        $zip->open($filename);
+        
+        if (!$zip->open($filename))
+        {
+            return false;
+        }
         
         if ($zip->extractTo($this->plugin->getPath()))
         {

@@ -31,11 +31,19 @@ class Manager
      */
     private $dependencyManager;
     
+    /**
+     * The plugin updater
+     *
+     * @var Updater
+     */
+    private $updater;
+    
     public function __construct (\Favez\ORM\App $db)
     {
         $this->db                = $db;
         $this->instances         = [];
         $this->dependencyManager = new DependencyManager();
+        $this->updater           = new Updater();
     }
     
     /**
@@ -342,7 +350,7 @@ class Manager
             
             if (version_compare($model->version, $instance->getInfo()->getVersion(), '>='))
             {
-                throw new Exception('The plugin is already up-to-date.');
+                throw new Exception('The plugin is already up-to-date.', 304);
             }
             
             self::events()->publish('core.plugin.pre_update', ['instance' => $instance]);
@@ -364,6 +372,7 @@ class Manager
             return [
                 'success' => false,
                 'message' => $ex->getMessage(),
+                'code'    => $ex->getCode()
             ];
         }
     }
@@ -450,6 +459,24 @@ class Manager
                 'success' => false,
                 'message' => $ex->getMessage(),
             ];
+        }
+    }
+    
+    public function getUpdater ()
+    {
+        return $this->updater;
+    }
+    
+    /**
+     * Method to reset a cached plugin instance.
+     *
+     * @param string $name
+     */
+    public function resetInstance ($name)
+    {
+        if (isset($this->instances[$name]))
+        {
+            unset ($this->instances[$name]);
         }
     }
     

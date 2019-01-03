@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -23,6 +23,10 @@
     "0.0.7": [
       "Add /media directory to .gitignore",
       "Better implementation for the default site when no routes are registered"
+    ],
+    "0.0.8": [
+      "Fix migrations when installing or updating a plugin",
+      "Improve plugin console commands"
     ]
   },
   "package": {

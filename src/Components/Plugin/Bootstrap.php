@@ -119,7 +119,7 @@ abstract class Bootstrap
     {
         $pluginID  = $this->getInstance()->getModel()->id;
         $directory = path($this->getPath(), 'Migrations');
-        $namespace = $this->getInstance()->getModel()->name . '\\Migrations\\';
+        $namespace = 'ProVallo\\Plugins\\' . $this->getInstance()->getModel()->name . '\\Migrations\\';
         
         $runner = new MigrationRunner($pluginID, $directory);
         $runner->setNamespace($namespace);

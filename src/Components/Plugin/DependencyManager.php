@@ -14,6 +14,8 @@ class DependencyManager
      * Update the plugin dependencies in database.
      *
      * @param \ProVallo\Components\Plugin\Instance $instance
+     *
+     * @throws \Exception
      */
     public function update (Instance $instance)
     {
@@ -105,12 +107,12 @@ class DependencyManager
             
             if (!($plugin instanceof Plugin))
             {
-                throw new Exception('Required plugin not found or installed: ' . $name);
+                throw new Exception('The plugin requires "' . $name . '" to be installed.');
             }
             
             if (!version_compare($version, $plugin->version, '<='))
             {
-                throw new Exception(sprintf('Required plugin version (%s) does not match! (%s)', $version, $plugin->version));
+                throw new Exception('The plugin requires "' . $name . '" to be installed in version ' . $version . ' or higher.');
             }
         }
         

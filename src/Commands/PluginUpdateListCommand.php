@@ -19,8 +19,6 @@ class PluginUpdateListCommand extends Command
     {
         $this->setName('plugin:updates')
             ->setDescription('Checks all plugins for updates and list those.');
-        
-        $this->addOption('apply', null, InputOption::VALUE_REQUIRED, 'Apply updates');
     }
     
     public function execute (InputInterface $input, OutputInterface $output)
@@ -55,12 +53,6 @@ class PluginUpdateListCommand extends Command
             return;
         }
         
-        if ($pluginName = $input->getOption('apply'))
-        {
-            $this->updatePlugin($pluginName, $output);
-            return;
-        }
-        
         /**
          * @var integer                                    $i
          * @var \ProVallo\Components\Plugin\Updater\Update $update
@@ -79,40 +71,6 @@ class PluginUpdateListCommand extends Command
                 $newVersion
             ));
         }
-
-    }
-    
-    protected function updatePlugin ($name, OutputInterface $output)
-    {
-        $manager = new Manager($this->models());
-        $updater = new Updater();
-    
-        $plugin = $manager->loadInstance($name);
-    
-        if (!($plugin instanceof Instance))
-        {
-            $output->writeln('Plugin by name not found.');
-        
-            return;
-        }
-    
-        $update = $updater->checkForUpdate($plugin);
-    
-        if (!($update instanceof Updater\Update))
-        {
-            $output->writeln('No updates available.');
-        
-            return;
-        }
-    
-        $output->writeln('Downloading version ' . $update->getVersion() . ' ...');
-        $filename = $update->download();
-    
-        $output->writeln('Extracting update files ...');
-        $update->extract($filename);
-        
-        $output->writeln('Installing update...');
-        $manager->update($name);
     }
     
 }

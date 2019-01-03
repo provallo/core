@@ -6,10 +6,13 @@ use ProVallo\Components\Command;
 use ProVallo\Components\Plugin\Bootstrap;
 use ProVallo\Components\Plugin\Manager;
 use ProVallo\Components\Plugin\Updater;
+use ProVallo\Core;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\Question;
 
 class PluginUpdateCommand extends Command
 {
@@ -24,10 +27,8 @@ class PluginUpdateCommand extends Command
     
     public function execute (InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
-        
-        $manager = new Manager($this->models());
-        $result  = $manager->update($name);
+        $name   = $input->getArgument('name');
+        $result = Core::plugins()->update($name);
         
         if (isSuccess($result))
         {
@@ -35,7 +36,69 @@ class PluginUpdateCommand extends Command
         }
         else
         {
-            $output->writeln($result['message']);
+            if ($result['code'] === 304)
+            {
+                /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+                $helper   = $this->getHelper('question');
+                $question = new ConfirmationQuestion('The plugin is already up-to-date. Do you want to check for updates from the store? [yes]: ');
+                $result   = $helper->ask($input, $output, $question);
+                
+                if ($result === true)
+                {
+                    $this->checkForUpdates($input, $output, $name);
+                }
+            }
+            else
+            {
+                $output->writeln($result['message']);
+            }
+        }
+    }
+    
+    protected function checkForUpdates (InputInterface $input, OutputInterface $output, $name)
+    {
+        $plugins = Core::plugins();
+        $updater = $plugins->getUpdater();
+        
+        $plugin = $plugins->loadInstance($name);
+        $update = $updater->checkForUpdate($plugin);
+    
+        if (!($update instanceof Updater\Update))
+        {
+            $output->writeln('No updates available.');
+        
+            return;
+        }
+    
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
+        $helper   = $this->getHelper('question');
+        $question = new ConfirmationQuestion('A new version (' . $update->getVersion() . ') is available! Install? [yes]: ');
+        $result   = $helper->ask($input, $output, $question);
+        
+        if ($result === true)
+        {
+            $filename = $update->download();
+            
+            if ($update->extract($filename))
+            {
+                $plugins->resetInstance($name);
+                
+                $result = $plugins->update($name);
+    
+                if (!isSuccess($result))
+                {
+                    $output->writeln($result['message']);
+                }
+                else
+                {
+                    $output->writeln('The update were installed successfully.');
+                }
+            }
+            else
+            {
+                $output->writeln('Unable to unzip the plugin file...');
+                $output->writeln('Filename: ' . $filename);
+            }
         }
     }
     

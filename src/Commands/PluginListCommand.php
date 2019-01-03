@@ -28,11 +28,8 @@ class PluginListCommand extends Command
         $table   = new Table($output);
         $table->setHeaders([
             'Name',
-            'Label',
-            'Version',
-            'Created',
-            'Updated',
-            'Active/Installed'
+            'Current Version',
+            'Installed'
         ]);
         
         /** @var Instance $plugin */
@@ -40,10 +37,7 @@ class PluginListCommand extends Command
         {
             $table->addRow([
                 $plugin->getName(),
-                $plugin->getInfo()->getLabel(),
                 $plugin->getModel()->version,
-                $plugin->getModel()->created,
-                $plugin->getModel()->changed,
                 $plugin->getModel()->active ? 'Yes' : 'No'
             ]);
         }
