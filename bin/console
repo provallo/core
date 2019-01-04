@@ -16,6 +16,10 @@ $console->addCommands([
     new \ProVallo\Commands\PluginUpdateListCommand(),
     new \ProVallo\Commands\PluginUpdateCommand(),
     
+    new \ProVallo\Commands\PluginStoreSearchCommand(),
+    new \ProVallo\Commands\PluginStoreInstallCommand(),
+    new \ProVallo\Commands\PluginStoreRemoveCommand(),
+    
     new \ProVallo\Commands\DbInstallCommand(),
     new \ProVallo\Commands\DbMigrateCommand()
 ]);
