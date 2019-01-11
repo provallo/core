@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -27,6 +27,9 @@
     "0.0.8": [
       "Fix migrations when installing or updating a plugin",
       "Improve plugin console commands"
+    ],
+    "0.0.9": [
+      "Requires favez/orm 1.1.4 for better compatibility"
     ]
   },
   "package": {
