@@ -4,6 +4,7 @@ namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
 use ProVallo\Core;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -48,7 +49,31 @@ class PluginStoreSearchCommand extends Command
             $items = $store->search($phrase);
         }
         
-        var_dump($items);
+        if (empty($items))
+        {
+            $output->writeln('Sorry, but I couldn\'t find plugins matching your search phrase.');
+            return;
+        }
+    
+        $table   = new Table($output);
+        $table->setHeaders([
+            'Name',
+            'Current Version',
+            'Date',
+            'Description'
+        ]);
+    
+        foreach ($items as $item)
+        {
+            $table->addRow([
+                $item['label'],
+                $item['latestVersion'],
+                $item['created'],
+                $item['description']
+            ]);
+        }
+    
+        $table->render();
     }
     
 }

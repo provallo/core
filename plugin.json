@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -30,6 +30,9 @@
     ],
     "0.0.9": [
       "Requires favez/orm 1.1.4 for better compatibility"
+    ],
+    "0.1.0": [
+      "Add store methods"
     ]
   },
   "package": {

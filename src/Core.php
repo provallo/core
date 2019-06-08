@@ -118,6 +118,10 @@ class Core extends \Favez\Mvc\App
         $container->registerShared('plugins', function () {
             return new \ProVallo\Components\Plugin\Manager($this->models());
         });
+        
+        $container->registerShared('store', function () {
+            return new \ProVallo\Components\Plugin\Store();
+        });
     }
     
     /**
