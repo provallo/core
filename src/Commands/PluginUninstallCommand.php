@@ -30,8 +30,7 @@ class PluginUninstallCommand extends Command
         }
         else
         {
-            $output->writeln('Unable to uninstall the plugin!');
-            $output->writeln(json_encode($result, JSON_PRETTY_PRINT));
+            $output->writeln($result['message']);
         }
     }
     

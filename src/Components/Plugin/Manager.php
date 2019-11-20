@@ -256,6 +256,12 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
+            
+            if (!($model instanceof Plugin))
+            {
+                throw new Exception('Plugin by name not found.');
+            }
+            
             $instance = $this->loadInstance($model->name, $model);
             
             if ((int) $model->active === 1)
@@ -301,6 +307,12 @@ class Manager
         try
         {
             $model    = $this->getModel($name);
+            
+            if (!($model instanceof Plugin))
+            {
+                throw new Exception('Plugin by name not found.');
+            }
+            
             $instance = $this->loadInstance($model->name, $model);
             
             if ((int) $model->active === 0)
