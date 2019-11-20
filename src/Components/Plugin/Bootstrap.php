@@ -124,7 +124,16 @@ abstract class Bootstrap
         $runner = new MigrationRunner($pluginID, $directory);
         $runner->setNamespace($namespace);
         
-        $runner->run();
+        $result = $runner->run();
+        
+        if (isSuccess($result))
+        {
+        
+        }
+        else
+        {
+            throw $result['exception'];
+        }
     }
     
 }

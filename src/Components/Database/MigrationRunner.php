@@ -73,12 +73,14 @@ class MigrationRunner
         
         $executedCount = 0;
 
-        foreach ($migrations as $version => $statements)
+        foreach ($migrations as $version => $migration)
         {
+            $migration->up();
+            
             if ($this->pluginID === -1 && $version === 100 && !$this->tableExists('schema_version'))
             {
                 $this->output->writeln('Running ' . $version);
-                $this->executeSQL($statements);
+                $this->executeSQL($migration->getSQL());
                 
                 $executedCount++;
 
@@ -119,7 +121,7 @@ class MigrationRunner
             
             try
             {
-                $this->executeSQL($statements);
+                $this->executeSQL($migration->getSQL());
                 
                 $schema->endDate = date('Y-m-d H:i:s');
                 $schema->save();
@@ -174,6 +176,11 @@ class MigrationRunner
         }
     }
     
+    /**
+     * @return \ProVallo\Components\Database\Migration[]
+     *
+     * @throws \Exception
+     */
     protected function findMigrations ()
     {
         $migrations = [];
@@ -200,9 +207,9 @@ class MigrationRunner
             
             /** @var \ProVallo\Components\Database\Migration $migration */
             $migration = new $className(Core::instance(), $version);
-            $migration->up();
+            // $migration->up();
             
-            $migrations[$version] = $migration->getSQL();
+            $migrations[$version] = $migration;
         }
 
         ksort($migrations);
