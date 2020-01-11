@@ -31,6 +31,11 @@ class Core extends \Favez\Mvc\App
      */
     protected $api;
     
+    /**
+     * @var string
+     */
+    protected $version;
+    
     public function __construct (Config $config = null, $loader = null, $api = self::API_CONSOLE)
     {
         App::$instance = $this;
@@ -66,6 +71,19 @@ class Core extends \Favez\Mvc\App
     public function getApi ()
     {
         return $this->api;
+    }
+    
+    public function getVersion()
+    {
+        if (empty($this->version))
+        {
+            $filename = __DIR__ . '/../plugin.json';
+            $data     = json_decode(file_get_contents($filename), true);
+            
+            $this->version = $data['version'];
+        }
+        
+        return $this->version;
     }
     
     /**
