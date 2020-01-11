@@ -23,7 +23,7 @@ class Manager
      * @var Instance[]
      */
     private $instances;
-
+    
     /**
      * The plugin dependency manager.
      *
@@ -88,7 +88,7 @@ class Manager
         $plugins = [];
         
         $iterator = new \IteratorIterator(new \DirectoryIterator($this->getPluginDirectory()));
-
+        
         /**
          * @var integer            $key
          * @var \DirectoryIterator $file
@@ -99,40 +99,40 @@ class Manager
             {
                 continue; // Skip "." and ".." and normal files.
             }
-
+            
             $name  = $file->getBasename();
             $model = $this->getModel($name);
-
+            
             if (!($model instanceof Plugin))
             {
-                $model            = Plugin::create();
-                $model->active    = 0;
-                $model->name      = $name;
-                $model->created   = date('Y-m-d H:i:s');
-                $model->changed   = date('Y-m-d H:i:s');
+                $model          = Plugin::create();
+                $model->active  = 0;
+                $model->name    = $name;
+                $model->created = date('Y-m-d H:i:s');
+                $model->changed = date('Y-m-d H:i:s');
             }
-
+            
             $instance = $this->loadInstance($model->name, $model);
             $info     = $instance->getInfo();
-
+            
             $model->label       = $info->getLabel();
             $model->description = $info->getDescription();
             $model->author      = $info->getAuthor();
             $model->website     = $info->getWebsite();
             $model->email       = $info->getEmail();
-
+            
             // Do not update the model version every time for future updates.
             // Update plugin version when plugin is not installed.
             if (empty($model->version) || $model->active == 0)
             {
                 $model->version = $info->getVersion();
             }
-
+            
             $model->save();
-
+            
             $this->dependencyManager->update($instance);
         }
-
+        
         return $plugins;
     }
     
@@ -153,7 +153,7 @@ class Manager
         $path      = $this->getPluginDirectory() . $name . '/';
         
         self::app()->loader()->setPsr4($namespace, $path);
-
+        
         return class_exists($className);
     }
     
@@ -164,8 +164,8 @@ class Manager
      * @param string $name
      * @param Plugin $model
      *
-     * @throws \Exception
      * @return Instance
+     * @throws \Exception
      */
     public function loadInstance ($name, $model = null)
     {
@@ -249,13 +249,13 @@ class Manager
      *
      * @param string $name
      *
-     * @return array|bool
+     * @return \ProVallo\Components\Plugin\LifecycleResult
      */
     public function install ($name)
     {
         try
         {
-            $model    = $this->getModel($name);
+            $model = $this->getModel($name);
             
             if (!($model instanceof Plugin))
             {
@@ -275,10 +275,11 @@ class Manager
             self::events()->publish('core.plugin.pre_install', ['instance' => $instance]);
             
             $result = $instance->getBootstrap()->install();
+            $result = LifecycleResult::create($result, LifecycleResult::TYPE_INSTALL);
             
             self::events()->publish('core.plugin.post_install', ['instance' => $instance]);
             
-            if (isSuccess($result))
+            if ($result->isSuccess())
             {
                 $model->active = 1;
                 $model->save();
@@ -288,10 +289,11 @@ class Manager
         }
         catch (\Exception $ex)
         {
-            return [
-                'success' => false,
-                'message' => $ex->getMessage(),
-            ];
+            return new LifecycleResult(
+                LifecycleResult::TYPE_INSTALL,
+                false,
+                $ex->getMessage()
+            );
         }
     }
     
@@ -300,13 +302,13 @@ class Manager
      *
      * @param string $name
      *
-     * @return array|bool
+     * @return \ProVallo\Components\Plugin\LifecycleResult
      */
     public function uninstall ($name)
     {
         try
         {
-            $model    = $this->getModel($name);
+            $model = $this->getModel($name);
             
             if (!($model instanceof Plugin))
             {
@@ -328,10 +330,11 @@ class Manager
             self::events()->publish('core.plugin.pre_uninstall', ['instance' => $instance]);
             
             $result = $instance->getBootstrap()->uninstall();
+            $result = LifecycleResult::create($result, LifecycleResult::TYPE_UNINSTALL);
             
             self::events()->publish('core.plugin.post_uninstall', ['instance' => $instance]);
             
-            if (isSuccess($result))
+            if ($result->isSuccess())
             {
                 $model->active = 0;
                 $model->save();
@@ -341,13 +344,19 @@ class Manager
         }
         catch (\Exception $ex)
         {
-            return [
-                'success' => false,
-                'message' => $ex->getMessage(),
-            ];
+            return new LifecycleResult(
+                LifecycleResult::TYPE_UNINSTALL,
+                false,
+                $ex->getMessage()
+            );
         }
     }
     
+    /**
+     * @param string $name
+     *
+     * @return array|bool|\ProVallo\Components\Plugin\LifecycleResult
+     */
     public function update ($name)
     {
         try
@@ -368,10 +377,11 @@ class Manager
             self::events()->publish('core.plugin.pre_update', ['instance' => $instance]);
             
             $result = $instance->getBootstrap()->update($model->version);
+            $result = LifecycleResult::create($result, LifecycleResult::TYPE_UPDATE);
             
             self::events()->publish('core.plugin.post_update', ['instance' => $instance]);
             
-            if (isSuccess($result))
+            if ($result->isSuccess())
             {
                 $model->version = $instance->getInfo()->getVersion();
                 $model->save();
@@ -381,11 +391,11 @@ class Manager
         }
         catch (\Exception $ex)
         {
-            return [
-                'success' => false,
-                'message' => $ex->getMessage(),
-                'code'    => $ex->getCode()
-            ];
+            return new LifecycleResult(
+                LifecycleResult::TYPE_UPDATE,
+                false,
+                $ex->getMessage()
+            );
         }
     }
     

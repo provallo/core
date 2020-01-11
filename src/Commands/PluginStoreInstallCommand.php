@@ -84,8 +84,8 @@ class PluginStoreInstallCommand extends Command
                 return $version['version'];
             }, $versions));
             
-            $version  = $helper->ask($this->input, $this->output, $question);
-            $version  = array_first(array_filter($versions, function ($result) use ($version)
+            $version = $helper->ask($this->input, $this->output, $question);
+            $version = array_first(array_filter($versions, function ($result) use ($version)
             {
                 return $result['version'] === $version;
             }));
@@ -114,7 +114,7 @@ class PluginStoreInstallCommand extends Command
         
         $zip = new \ZipArchive();
         $zip->open($filename);
-    
+        
         $json = $zip->getFromName('plugin.json');
         $json = json_decode($json, true);
         
@@ -124,16 +124,16 @@ class PluginStoreInstallCommand extends Command
             
             $this->output->writeln('The plugin is already installed.');
             
-            unlink ($filename);
+            unlink($filename);
             die;
         }
         catch (\Exception $ex)
         {
             // ignore, and continue...
         }
-    
+        
         $this->output->writeln('Extracting...');
-    
+        
         $destination = Core::path() . 'ext/' . $json['label'];
         
         $zip->extractTo($destination);
@@ -144,14 +144,14 @@ class PluginStoreInstallCommand extends Command
         $plugins->synchronize();
         
         $result = $plugins->install($json['label']);
-    
-        if (isSuccess($result))
+        
+        if ($result->isSuccess())
         {
             $this->output->writeln('The plugin were installed successfully.');
         }
         else
         {
-            $this->output->writeln($result['message']);
+            $this->output->writeln($result->getMessage());
         }
     }
     

@@ -3,6 +3,8 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
+use ProVallo\Components\Job\JobInterface;
+use ProVallo\Components\Job\JobRunner;
 use ProVallo\Core;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,13 +26,21 @@ class PluginInstallCommand extends Command
         $name   = trim($input->getArgument('name'));
         $result = Core::plugins()->install($name);
         
-        if (isSuccess($result))
+        if ($result->isSuccess())
         {
             $output->writeln('The plugin were installed successfully.');
+            
+            if ($result->hasJobs())
+            {
+                $output->writeln('Running post jobs ...');
+                
+                $runner = new JobRunner($output);
+                $runner->run($result->getJobs());
+            }
         }
         else
         {
-            $output->writeln($result['message']);
+            $output->writeln($result->getMessage());
         }
     }
     

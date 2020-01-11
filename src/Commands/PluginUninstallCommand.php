@@ -3,6 +3,7 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
+use ProVallo\Components\Job\JobRunner;
 use ProVallo\Core;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,13 +25,21 @@ class PluginUninstallCommand extends Command
         $name   = trim($input->getArgument('name'));
         $result = Core::plugins()->uninstall($name);
         
-        if (isSuccess($result))
+        if ($result->isSuccess())
         {
             $output->writeln('The plugin were uninstalled successfully.');
+    
+            if ($result->hasJobs())
+            {
+                $output->writeln('Running post jobs ...');
+        
+                $runner = new JobRunner($output);
+                $runner->run($result->getJobs());
+            }
         }
         else
         {
-            $output->writeln($result['message']);
+            $output->writeln($result->getMessage());
         }
     }
     

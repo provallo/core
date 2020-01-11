@@ -3,6 +3,7 @@
 namespace ProVallo\Commands;
 
 use ProVallo\Components\Command;
+use ProVallo\Components\Job\JobRunner;
 use ProVallo\Components\Plugin\Bootstrap;
 use ProVallo\Components\Plugin\Manager;
 use ProVallo\Components\Plugin\Updater;
@@ -30,9 +31,17 @@ class PluginUpdateCommand extends Command
         $name   = $input->getArgument('name');
         $result = Core::plugins()->update($name);
         
-        if (isSuccess($result))
+        if ($result->isSuccess())
         {
             $output->writeln('The plugin were updated successfully.');
+            
+            if ($result->hasJobs())
+            {
+                $output->writeln('Running post jobs ...');
+                
+                $runner = new JobRunner($output);
+                $runner->run($result->getJobs());
+            }
         }
         else
         {
@@ -50,7 +59,7 @@ class PluginUpdateCommand extends Command
             }
             else
             {
-                $output->writeln($result['message']);
+                $output->writeln($result->getMessage());
             }
         }
     }
@@ -62,14 +71,14 @@ class PluginUpdateCommand extends Command
         
         $plugin = $plugins->loadInstance($name);
         $update = $updater->checkForUpdate($plugin);
-    
+        
         if (!($update instanceof Updater\Update))
         {
             $output->writeln('No updates available.');
-        
+            
             return;
         }
-    
+        
         /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
         $helper   = $this->getHelper('question');
         $question = new ConfirmationQuestion('A new version (' . $update->getVersion() . ') is available! Install? [yes]: ');
@@ -84,14 +93,22 @@ class PluginUpdateCommand extends Command
                 $plugins->resetInstance($name);
                 
                 $result = $plugins->update($name);
-    
-                if (!isSuccess($result))
+                
+                if ($result->isSuccess())
                 {
-                    $output->writeln($result['message']);
+                    $output->writeln('The update were installed successfully.');
+                    
+                    if ($result->hasJobs())
+                    {
+                        $output->writeln('Running post jobs ...');
+                        
+                        $runner = new JobRunner($output);
+                        $runner->run($result->getJobs());
+                    }
                 }
                 else
                 {
-                    $output->writeln('The update were installed successfully.');
+                    $output->writeln($result->getMessage());
                 }
             }
             else
