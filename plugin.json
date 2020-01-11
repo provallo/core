@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -33,6 +33,10 @@
     ],
     "0.1.0": [
       "Add store methods"
+    ],
+    "0.2.0": [
+      "Add Plugin/LifecycleResult",
+      "Allow plugins to run jobs after install/update/uninstall"
     ]
   },
   "package": {
