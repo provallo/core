@@ -100,11 +100,14 @@ class DependencyManager
         
         foreach ($requires as $name => $version)
         {
-            if ($name === 'core'
-                && !version_compare($version, Core::instance()->getVersion(), '<=')
-            )
+            if ($name === 'core')
             {
-                throw new Exception('The plugin requires the core in version ' . $version . ' or higher.');
+                if (!version_compare($version, Core::instance()->getVersion(), '<='))
+                {
+                    throw new Exception('The plugin requires the core in version ' . $version . ' or higher.');
+                }
+                
+                continue;
             }
             
             $plugin = Plugin::repository()->findOneBy([
@@ -122,8 +125,6 @@ class DependencyManager
                 throw new Exception('The plugin requires "' . $name . '" to be installed in version ' . $version . ' or higher.');
             }
         }
-        
-        die('alright');
         
         return true;
     }
