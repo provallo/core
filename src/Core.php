@@ -4,10 +4,9 @@ namespace ProVallo;
 
 use Favez\Mvc\App;
 use Favez\Mvc\Middleware\JsonResponseMiddleware;
-use ProVallo\Components\Plugin\Manager;
+use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\Router;
 
 /**
  * Class Core
@@ -24,7 +23,7 @@ class Core extends \Favez\Mvc\App
     
     const API_CONSOLE = 'console';
     
-    const API_WEB = 'web';
+    const API_WEB     = 'web';
     
     /**
      * @var string
@@ -42,7 +41,7 @@ class Core extends \Favez\Mvc\App
         $this->api     = $api;
         
         $this->setLoader($loader);
-
+        
         if ($config === null)
         {
             $config = new Config();
@@ -51,7 +50,7 @@ class Core extends \Favez\Mvc\App
         }
         
         parent::__construct($config->toArray());
-
+        
         $this->registerServices();
         
         if ($this->config('httpCache.enabled') === true)
@@ -60,7 +59,7 @@ class Core extends \Favez\Mvc\App
         }
     }
     
-    public function run ($silent = false)
+    public function run ($silent = false): ResponseInterface
     {
         $this->executePlugins();
         $this->registerRoutes();
@@ -73,7 +72,7 @@ class Core extends \Favez\Mvc\App
         return $this->api;
     }
     
-    public function getVersion()
+    public function getVersion ()
     {
         if (empty($this->version))
         {
@@ -104,7 +103,7 @@ class Core extends \Favez\Mvc\App
      */
     public function registerModule ($name, $config)
     {
-        $modules = self::config()->get('modules');
+        $modules        = self::config()->get('modules');
         $modules[$name] = $config;
         
         self::config()->set('modules', $modules);
@@ -129,15 +128,18 @@ class Core extends \Favez\Mvc\App
     {
         $container = $this->di();
         
-        $container->registerShared('httpCache', function () {
+        $container->registerShared('httpCache', function ()
+        {
             return new \ProVallo\Components\HttpCache($this);
         });
         
-        $container->registerShared('plugins', function () {
+        $container->registerShared('plugins', function ()
+        {
             return new \ProVallo\Components\Plugin\Manager($this->models());
         });
         
-        $container->registerShared('store', function () {
+        $container->registerShared('store', function ()
+        {
             return new \ProVallo\Components\Plugin\Store();
         });
     }
@@ -149,9 +151,11 @@ class Core extends \Favez\Mvc\App
     protected function registerRoutes ()
     {
         $this->add(new JsonResponseMiddleware());
-    
-        Core::instance()->getContainer()['notFoundHandler'] = function() {
-            return function (Request $request, Response $response) {
+        
+        Core::instance()->getContainer()['notFoundHandler'] = function ()
+        {
+            return function (Request $request, Response $response)
+            {
                 $html = file_get_contents(__DIR__ . '/Resources/html/index.html');
                 $html = str_replace('../public', '/src/Resources/public', $html);
                 

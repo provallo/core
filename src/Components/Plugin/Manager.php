@@ -56,7 +56,7 @@ class Manager
         $instances = [];
         
         /** @var Plugin $plugin */
-        foreach ($plugins as $plugin)
+        foreach ($plugins->getIterator() as $plugin)
         {
             $instances[] = $this->loadInstance($plugin->name, $plugin);
         }
@@ -76,7 +76,7 @@ class Manager
         $plugins = Plugin::repository()->findAll();
         
         /** @var Plugin $plugin */
-        foreach ($plugins as $plugin)
+        foreach ($plugins->getIterator() as $plugin)
         {
             if (!$this->exists($plugin->name))
             {
@@ -229,7 +229,7 @@ class Manager
         $plugins    = $repository->findBy(['active' => true]);
         
         /** @var Plugin $plugin */
-        foreach ($plugins as $plugin)
+        foreach ($plugins->getIterator() as $plugin)
         {
             // If the plugin does not exists in filesystem disable it and do not try to execute it to prevent errors.
             if (!$this->exists($plugin->name))
