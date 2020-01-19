@@ -10,7 +10,7 @@
         "favez/favez": "^2.0.7",
         "favez/orm": "^1.1.4",
         "slim/http-cache": "^0.4.0",
-        "php": "^7.0",
+        "php": "^7.1",
         "ext-json": "*",
         "ext-zip": "*"
     },
