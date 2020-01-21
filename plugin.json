@@ -1,6 +1,6 @@
 {
   "packageID": "core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "changelog": {
     "0.0.1": [
       "Initial release with basic functionality"
@@ -49,6 +49,9 @@
     ],
     "0.5.0": [
       "Require php7.1"
+    ],
+    "0.5.1": [
+      "Fix plugin:update command"
     ]
   },
   "package": {
