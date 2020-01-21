@@ -45,7 +45,7 @@ class PluginUpdateCommand extends Command
         }
         else
         {
-            if ($result['code'] === 304)
+            if ($result->getCode() === 304)
             {
                 /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
                 $helper   = $this->getHelper('question');

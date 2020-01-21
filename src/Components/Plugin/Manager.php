@@ -394,7 +394,8 @@ class Manager
             return new LifecycleResult(
                 LifecycleResult::TYPE_UPDATE,
                 false,
-                $ex->getMessage()
+                $ex->getMessage(),
+                $ex->getCode()
             );
         }
     }
