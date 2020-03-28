@@ -3,10 +3,10 @@
 return [
     'config'   => [
         'database'  => [
-            'host' => '127.0.0.1',
-            'shem' => 'pv',
+            'host' => 'mysql.dev.localhost',
+            'shem' => 'pv_new',
             'user' => 'root',
-            'pass' => 'vagrant'
+            'pass' => 'athene'
         ],
     ]
 ];
