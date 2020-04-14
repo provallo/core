@@ -6,39 +6,38 @@ use ProVallo\Components\Job\JobInterface;
 
 class LifecycleResult
 {
-    
     const TYPE_INSTALL   = 'install';
-    
+
     const TYPE_UNINSTALL = 'uninstall';
-    
+
     const TYPE_UPDATE    = 'update';
-    
+
     /**
      * @var string
      */
     protected $type;
-    
+
     /**
      * @var boolean
      */
     protected $success;
-    
+
     /**
      * @var string
      */
     protected $message;
-    
+
     /**
-     * @var integer
+     * @var mixed
      */
     protected $code;
-    
+
     /**
      * @var JobInterface[]
      */
     protected $jobs;
-    
-    public function __construct (string $type, bool $success, string $message = '', int $code = 0)
+
+    public function __construct(string $type, bool $success, string $message = '', $code = 0)
     {
         $this->type    = $type;
         $this->success = $success;
@@ -46,56 +45,55 @@ class LifecycleResult
         $this->code    = $code;
         $this->jobs    = [];
     }
-    
-    public static function create ($result, $type): LifecycleResult
+
+    public static function create($result, $type): LifecycleResult
     {
-        if ($result instanceof self)
-        {
+        if ($result instanceof self) {
             return $result;
         }
-        else if (is_bool($result))
-        {
+
+        if (is_bool($result)) {
             return new self($type, $result);
         }
-        else
-        {
-            throw new \Exception('Unexpected result type.');
-        }
+
+        throw new \Exception('Unexpected result type.');
     }
-    
-    public function isSuccess (): bool
+
+    public function isSuccess(): bool
     {
         return $this->success;
     }
-    
-    public function getMessage (): string
+
+    public function getMessage(): string
     {
         return $this->message;
     }
-    
-    public function getCode (): int
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
     {
         return $this->code;
     }
-    
-    public function addJob (JobInterface $job): LifecycleResult
+
+    public function addJob(JobInterface $job): LifecycleResult
     {
         $this->jobs[] = $job;
-        
+
         return $this;
     }
-    
+
     /**
      * @return JobInterface[]
      */
-    public function getJobs (): array
+    public function getJobs(): array
     {
         return $this->jobs;
     }
-    
-    public function hasJobs (): bool
+
+    public function hasJobs(): bool
     {
         return !empty($this->jobs);
     }
-    
 }
